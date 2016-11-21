@@ -1,6 +1,6 @@
 {
   "name": "twgl_cc",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cocos2d-x extensions for twgl library",
   "main": "index.js",
   "scripts": {

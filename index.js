@@ -4,19 +4,30 @@ var twgl_cc = {
      * See http://twgljs.org/docs/module-twgl.html#.createProgramInfo.
      * @param {String} vertexShaderPath
      * @param {String} fragmentShaderPath
-     * @param {Object} opts
-     * @returns {twgl.ProgramInfo} The created ProgramInfo or null if it failed to link or compile
+     * @param {Object} options
+     * @returns {Object} Dictionary which has {twgl.ProgramInfo} under 'twgl' key, {cc.GLProgram} under 'cc' and {WebGLProgram} under 'webgl'
      */
-    createProgramInfo: function (vertexShaderPath, fragmentShaderPath, opts) {
-        opts || (opts = {});
+    createProgramInfo: function (vertexShaderPath, fragmentShaderPath, options) {
+        options || (options = {});
         var shader = new cc.GLProgram(vertexShaderPath, fragmentShaderPath);
+        if (options.attribs) {
+            for (var attributeName in options.attribs) {
+                var index = options.attribs[attributeName];
+                shader.addAttribute(attributeName, index)
+            }
+        }
         shader.link();
         shader.updateUniforms();
         shader.setUniformsForBuiltins();
-        if (opts.attribPrefix !== false) {
-            twgl.setDefaults({attribPrefix: opts.attribPrefix ? opts.attribPrefix : 'a_'});
+        if (options.attribPrefix !== false) {
+            twgl.setDefaults({attribPrefix: options.attribPrefix ? options.attribPrefix : 'a_'});
         }
-        return twgl.createProgramInfoFromProgram(this.gl, shader.getProgram());
+        var programInfo = twgl.createProgramInfoFromProgram(this.gl, shader.getProgram());
+        return {
+            twgl: programInfo,
+            cc: shader,
+            webgl: shader.getProgram()
+        };
     },
 
     /**
